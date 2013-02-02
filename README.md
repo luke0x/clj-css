@@ -2,6 +2,8 @@
 
 Parse, emit, and convert between various CSS file formats
 
+[![Build Status](https://travis-ci.org/luke0x/clj-css.png?branch=master)](https://travis-ci.org/luke0x/clj-css)
+
 ## Usage
 
 ```
