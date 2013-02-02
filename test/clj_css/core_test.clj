@@ -2,18 +2,18 @@
   (:use clojure.test
         clj-css.core))
 
-(deftest test-parse-css
+(deftest #^{:focus "focus"} test-parse-css
   (are [in out] (= (parse-css in) out)
     "" []
-    "h1 { color: #abcdef; }" [:h1 {:color "#abcdef"}]
-    ; "h1 span { color: #abcdef; }" [:h1 :span {:color "#abcdef"}]
+    "h1 { color: white; }" [:h1 {:color "white"}]
+    "h1 span { color: white; }" [:h1 :span {:color "white"}]
     ))
 
 (deftest test-emit-css
   (are [in out] (= (emit-css in) out)
     [] ""
-    [:h1 {:color "#abcdef"}] "h1 { color: #abcdef; }"
-    [:h1 :span {:color "#abcdef"}] "h1 span { color: #abcdef; }"))
+    [:h1 {:color "white"}] "h1 { color: white; }"
+    [:h1 :span {:color "white"}] "h1 span { color: white; }"))
 
 (deftest test-parse-scss
   (are [in out] (= (parse-scss in) out)
@@ -26,5 +26,3 @@
 (deftest test-css-to-scss
   (are [in out] (= (css-to-scss in) out)
     [] []))
-
-; (run-all-tests)

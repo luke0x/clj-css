@@ -1,17 +1,60 @@
 (ns clj-css.core
-  (:use [clojure.test]
-        [clojure.string :only [blank? trim]]))
+  (:use [clojure.reflect]
+        [clojure.pprint])
+  (:require clojure.string)
+  (:import com.steadystate.css.parser.CSSOMParser
+           (org.w3c.dom.css CSSStyleSheet CSSRuleList CSSRule CSSStyleRule CSSStyleDeclaration)
+           org.w3c.css.sac.InputSource
+           java.io.StringReader))
+
+; http://www.reddit.com/r/Clojure/comments/10svup/parsing_css/
+
+(defn property-as-hash-map [property]
+ (let [split-property (-> property .toString (clojure.string/split #": "))]
+   {(-> split-property
+        (get 0)
+        keyword)
+    (-> split-property
+        (get 1))}))
+
+; (let [k (keyword (-> (first (.getSelectors (.getSelectors rule)))
+;                      .toString
+;                      (clojure.string/replace (str "*" root-class " *.") "")))
+(defn rule-as-hash-map [rule root-class]
+  (let [k  (-> rule
+               .getSelectors
+               .getSelectors
+               (->> (clojure.string/join " "))
+               (clojure.string/split #"\s+")
+               (->> (map #(keyword %))))
+        v (reduce merge
+            (map property-as-hash-map (.getProperties (.getStyle rule))))]
+    (conj (vec k) v)))
+
+(defn other-parse-css
+ "Parse a CSS String, return map of rules"
+ [css root-class]
+ (let [stream (StringReader. css)
+       source (InputSource. stream)
+       parser (CSSOMParser.)
+       stylesheet (.parseStyleSheet parser source nil nil)
+       rule-list (.getRules (.getCssRules stylesheet))]
+   (reduce merge
+     (map rule-as-hash-map rule-list (repeat ".syntax")))))
 
 ; https://github.com/programble/csslj/blob/master/src/csslj/core.clj
 
 (defn- render-ele [ele]
-  (->> ele (map name) (interpose " ") (apply str)))
+  (->> ele
+    (map name)
+    (interpose " ")
+    (apply str)))
 
 (defn- render-attrs [attrs]
   (apply str
-         (sort
-          (for [[attr value] attrs]
-            (str (name attr) ": " value "; ")))))
+    (sort
+      (for [[attr value] attrs]
+        (str (name attr) ": " value "; ")))))
 
 (defn css
   "Takes any amount of vectors of CSS elements and renders them as CSS"
@@ -20,7 +63,9 @@
            attrs (render-attrs (last vec))]
        (str ele " { " attrs "}")))
   ([vec & more]
-     (->> (map css (cons vec more)) (interpose " ") (apply str))))
+     (->> (map css (cons vec more))
+       (interpose " ")
+       (apply str))))
 
 ; [:page
 ;   [:header-bar]
@@ -133,13 +178,13 @@
   (if
     (empty? css)
     []
-    [:h1 {:color "#abcdef"}]))
+    (other-parse-css css "syntax")))
 
 (defn emit-css [css-clj]
   (if
     (empty? css-clj)
     ""
-    (trim (css css-clj))))
+    (clojure.string/trim (css css-clj))))
 
 (defn parse-scss [scss] [])
 (defn scss-to-css [scss] [])
