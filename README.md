@@ -1,13 +1,32 @@
 # clj-css
 
-A Clojure library designed to ... well, that part is up to you.
+Parse, emit, and convert between various CSS file formats
 
 ## Usage
 
-FIXME
+```
+(parse-css css)
+(emit-css css)
+```
+
+# CSS Formats
+
+* CSS
+* SCSS
+* SASS
+
+# Tests
+
+```
+lein test
+```
+
+## Dependencies
+
+[CSS Parser](http://cssparser.sourceforge.net)
 
 ## License
 
-Copyright © 2013 FIXME
+Copyright © 2013 Luke Crawford
 
-Distributed under the Eclipse Public License, the same as Clojure.
+Distributed under the [MIT License](http://www.opensource.org/licenses/MIT).
