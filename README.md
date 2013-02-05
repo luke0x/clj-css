@@ -1,3 +1,5 @@
+**STATUS: Alpha / incomplete / personal project**
+
 # clj-css
 
 Parse, emit, and convert between various CSS file formats
@@ -11,13 +13,17 @@ Parse, emit, and convert between various CSS file formats
 (emit-css css)
 ```
 
-# CSS Formats
+## Documentation
+
+[Marginalia Docs](http://luke0x.github.com/clj-css/docs/)
+
+## CSS Formats
 
 * CSS
 * SCSS
 * SASS
 
-# Tests
+## Tests
 
 ```
 lein test
