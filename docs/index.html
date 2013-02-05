@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="FIXME: write description" name="description" /><style type="text/css"></style><style type="text/css">.syntaxhighlighter{overflow:hidden !important;}</style><style type="text/css"></style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{display:inline;font-size:34px;}h2.project-version{display:inline;margin-left:10px;margin-top:0;font-size:18px;}.toc-link{margin-left:10px;color:#252519;font-size:12px;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{margin:0;font-size:34px;}.docs-header{margin-bottom:25px;padding-bottom:10px;border-bottom:dotted #aaa 1px;}.toc h1{font-size:24px;}.toc{margin-bottom:40px;border-bottom:solid #bbb 1px;}.toc ul{padding-left:0px;margin-left:20px;margin-top:0;padding-top:0;}.toc li{padding-left:0;list-style-type:none;}.dependencies{}.dependencies table{border:none;width:99.99%;margin-left:20px;font-size:16px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{padding-left:0px;margin-left:20px;margin-top:0;padding-top:0;}.plugins li{padding-left:0;list-style-type:none;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;text-align:right;overflow:hidden;top:10px;right:20px;height:20px;}#floating-toc li{margin:0;padding:0;list-style-type:none;}</style><style type="text/css">body{margin:0;padding:0;color:#252519;font-size:16px;background-color:#F5F5FF;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;}h1{margin-top:0;font-size:20px;}a.anchor{color:#252519;text-decoration:none;}a.anchor:hover{color:#5050A6;}table{margin-bottom:10px;border-bottom:solid #ddd 1px;;border-spacing:0;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{border:none;margin:0px;padding-left:55px;width:410px;padding-right:20px;vertical-align:top;max-width:410px;background-color:#FFF;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;background-color:ghostWhite;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><script type="text/javascript"></script><script type="text/javascript"></script><script type="text/javascript"></script><script type="text/javascript"></script><title>clj-css -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">clj-css</h1><h2 class="project-version">0.1.0-SNAPSHOT</h2><br /><p>FIXME: write description</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.4.0</td></tr><tr><td class="dep-name">net.sourceforge.cssparser/cssparser</td><td class="dotted"><hr /></td><td class="dep-version">0.9.7</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#clj-css.core">clj-css.core</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#clj-css.core" name="clj-css.core"><h1 class="project-name">clj-css.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(ns clj-css.core
+  (:use [clojure.reflect]
+        [clojure.pprint])
+  (:require clojure.string)
+  (:import com.steadystate.css.parser.CSSOMParser
+           (org.w3c.dom.css CSSStyleSheet CSSRuleList CSSRule CSSStyleRule CSSStyleDeclaration)
+           org.w3c.css.sac.InputSource
+           java.io.StringReader))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn property-as-hash-map [property]
+ (let [split-property (-&gt; property .toString (clojure.string/split #&quot;: &quot;))]
+   {(-&gt; split-property
+        (get 0)
+        keyword)
+    (-&gt; split-property
+        (get 1))}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn rule-as-hash-map [rule root-class]
+  (let [k  (-&gt; rule
+               .getSelectors
+               .getSelectors
+               (-&gt;&gt; (clojure.string/join &quot; &quot;))
+               (clojure.string/split #&quot;\s+&quot;)
+               (-&gt;&gt; (map #(keyword %))))
+        v (reduce merge
+            (map property-as-hash-map (.getProperties (.getStyle rule))))]
+    (conj (vec k) v)))</pre></td></tr><tr><td class="docs"><p>Parse a CSS String, return map of rules</p>
+</td><td class="codes"><pre class="brush: clojure">(defn other-parse-css
+ [css root-class]
+ (let [stream (StringReader. css)
+       source (InputSource. stream)
+       parser (CSSOMParser.)
+       stylesheet (.parseStyleSheet parser source nil nil)
+       rule-list (.getRules (.getCssRules stylesheet))]
+   (reduce merge
+     (map rule-as-hash-map rule-list (repeat &quot;.syntax&quot;)))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- render-ele [ele]
+  (-&gt;&gt; ele
+    (map name)
+    (interpose &quot; &quot;)
+    (apply str)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- render-attrs [attrs]
+  (apply str
+    (sort
+      (for [[attr value] attrs]
+        (str (name attr) &quot;: &quot; value &quot;; &quot;)))))</pre></td></tr><tr><td class="docs"><p>Takes any amount of vectors of CSS elements and renders them as CSS</p>
+</td><td class="codes"><pre class="brush: clojure">(defn css
+  ([vec]
+     (let [ele (render-ele (drop-last vec))
+           attrs (render-attrs (last vec))]
+       (str ele &quot; { &quot; attrs &quot;}&quot;)))
+  ([vec &amp; more]
+     (-&gt;&gt; (map css (cons vec more))
+       (interpose &quot; &quot;)
+       (apply str))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn parse-css [css]
+  (if
+    (empty? css)
+    []
+    (other-parse-css css &quot;syntax&quot;)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn emit-css [css-clj]
+  (if
+    (empty? css-clj)
+    (clojure.string/trim (css css-clj))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn parse-scss [scss] [])
+m(defn scss-to-css [scss] [])</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">m(defn scss-to-css [scss] [])
+(defn css-to-scss [css] [])</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+       SyntaxHighlighter.all()</script></body></html>
